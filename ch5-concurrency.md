@@ -20,6 +20,27 @@ Go 程（goroutine）是由 Go 运行时管理的轻量级线程。
 Go 程在相同的地址空间中运行，因此在访问共享的内存时必须进行同步。[sync](https://go-zh.org/pkg/sync/ ) 包提供了这种能力，不过在 Go 中并不经常用到，因为还有其它的办法（见下一页）。
 
 [goroutines.go](ch5-concurrency/goroutines/goroutines.go)
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func say(s string) {
+	for i := 0; i < 5; i++ {
+		time.Sleep(100 * time.Millisecond)
+		fmt.Println(s)
+	}
+}
+
+func main() {
+	go say("world")
+	say("hello")
+}
+```
+
 
 ## 2.信道
 
@@ -39,6 +60,31 @@ Go 程在相同的地址空间中运行，因此在访问共享的内存时必�
 以下示例对切片中的数进行求和，将任务分配给两个 Go 程。一旦两个 Go 程完成了它们的计算，它就能算出最终的结果。
 
 [channels.go](ch5-concurrency/channels/channels.go)
+```go
+package main
+
+import "fmt"
+
+func sum(s []int, c chan int) {
+	sum := 0
+	for _, v := range s {
+		sum += v
+	}
+	c <- sum // 将和送入 c
+}
+
+func main() {
+	s := []int{7, 2, 8, -9, 4, 0}
+
+	c := make(chan int)
+	go sum(s[:len(s)/2], c)
+	go sum(s[len(s)/2:], c)
+	x, y := <-c, <-c // 从 c 中接收
+
+	fmt.Println(x, y, x+y)
+}
+```
+
 
 ## 3.带缓冲的信道
 
@@ -51,6 +97,20 @@ Go 程在相同的地址空间中运行，因此在访问共享的内存时必�
 修改示例填满缓冲区，然后看看会发生什么。
 
 [buffered-channels.go](ch5-concurrency/buffered-channels/buffered-channels.go)
+```go
+package main
+
+import "fmt"
+
+func main() {
+	ch := make(chan int, 2)
+	ch <- 1
+	ch <- 2
+	fmt.Println(<-ch)
+	fmt.Println(<-ch)
+}
+```
+
 
 ## 4.range 和 close
 
@@ -67,6 +127,31 @@ Go 程在相同的地址空间中运行，因此在访问共享的内存时必�
 **还要注意**： 信道与文件不同，通常情况下无需关闭它们。只有在必须告诉接收者不再有需要发送的值时才有必要关闭，例如终止一个 `range` 循环。
 
 [range-and-close.go](ch5-concurrency/range-and-close/range-and-close.go)
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func fibonacci(n int, c chan int) {
+	x, y := 0, 1
+	for i := 0; i < n; i++ {
+		c <- x
+		x, y = y, x+y
+	}
+	close(c)
+}
+
+func main() {
+	c := make(chan int, 10)
+	go fibonacci(cap(c), c)
+	for i := range c {
+		fmt.Println(i)
+	}
+}
+```
+
 
 ## 5.select 语句
 
@@ -75,6 +160,37 @@ Go 程在相同的地址空间中运行，因此在访问共享的内存时必�
 `select` 会阻塞到某个分支可以继续执行为止，这时就会执行该分支。当多个分支都准备好时会随机选择一个执行。
 
 [select.go](ch5-concurrency/select/select.go)
+```go
+package main
+
+import "fmt"
+
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1
+	for {
+		select {
+		case c <- x:
+			x, y = y, x+y
+		case <-quit:
+			fmt.Println("quit")
+			return
+		}
+	}
+}
+
+func main() {
+	c := make(chan int)
+	quit := make(chan int)
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(<-c)
+		}
+		quit <- 0
+	}()
+	fibonacci(c, quit)
+}
+```
+
 
 ## 6.默认选择
 
@@ -90,6 +206,32 @@ Go 程在相同的地址空间中运行，因此在访问共享的内存时必�
 	}
 
 [default-selection.go](ch5-concurrency/default-selection/default-selection.go)
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	tick := time.Tick(100 * time.Millisecond)
+	boom := time.After(500 * time.Millisecond)
+	for {
+		select {
+		case <-tick:
+			fmt.Println("tick.")
+		case <-boom:
+			fmt.Println("BOOM!")
+			return
+		default:
+			fmt.Println("    .")
+			time.Sleep(50 * time.Millisecond)
+		}
+	}
+}
+```
+
 
 ## 7.练习：等价二叉查找树
 
@@ -130,6 +272,21 @@ Go 程在相同的地址空间中运行，因此在访问共享的内存时必�
 `Tree` 的文档可在[这里](https://godoc.org/golang.org/x/tour/tree#Tree )找到。
 
 [exercise-equivalent-binary-trees.go](ch5-concurrency/exercise-equivalent-binary-trees/exercise-equivalent-binary-trees.go)
+```go
+package main
+
+import "golang.org/x/tour/tree"
+
+// Walk 步进 tree t 将所有的值从 tree 发送到 channel ch。
+func Walk(t *tree.Tree, ch chan int)
+
+// Same 检测树 t1 和 t2 是否含有相同的值。
+func Same(t1, t2 *tree.Tree) bool
+
+func main() {
+}
+```
+
 
 ## 9.sync.Mutex
 
@@ -149,6 +306,48 @@ Go 标准库中提供了 [sync.Mutex](https://go-zh.org/pkg/sync/#Mutex ) 互斥
 我们也可以用 `defer` 语句来保证互斥锁一定会被解锁。参见 `Value` 方法。
 
 [mutex-counter.go](ch5-concurrency/mutex-counter/mutex-counter.go)
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+// SafeCounter 的并发使用是安全的。
+type SafeCounter struct {
+	v   map[string]int
+	mux sync.Mutex
+}
+
+// Inc 增加给定 key 的计数器的值。
+func (c *SafeCounter) Inc(key string) {
+	c.mux.Lock()
+	// Lock 之后同一时刻只有一个 goroutine 能访问 c.v
+	c.v[key]++
+	c.mux.Unlock()
+}
+
+// Value 返回给定 key 的计数器的当前值。
+func (c *SafeCounter) Value(key string) int {
+	c.mux.Lock()
+	// Lock 之后同一时刻只有一个 goroutine 能访问 c.v
+	defer c.mux.Unlock()
+	return c.v[key]
+}
+
+func main() {
+	c := SafeCounter{v: make(map[string]int)}
+	for i := 0; i < 1000; i++ {
+		go c.Inc("somekey")
+	}
+
+	time.Sleep(time.Second)
+	fmt.Println(c.Value("somekey"))
+}
+```
+
 
 ## 10.练习：Web 爬虫
 
@@ -159,6 +358,92 @@ Go 标准库中提供了 [sync.Mutex](https://go-zh.org/pkg/sync/#Mutex ) 互斥
 _提示_：你可以用一个 map 来缓存已经获取的 URL，但是要注意 map 本身并不是并发安全的！
 
 [exercise-web-crawler.go](ch5-concurrency/exercise-web-crawler/exercise-web-crawler.go)
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type Fetcher interface {
+	// Fetch 返回 URL 的 body 内容，并且将在这个页面上找到的 URL 放到一个 slice 中。
+	Fetch(url string) (body string, urls []string, err error)
+}
+
+// Crawl 使用 fetcher 从某个 URL 开始递归的爬取页面，直到达到最大深度。
+func Crawl(url string, depth int, fetcher Fetcher) {
+	// TODO: 并行的抓取 URL。
+	// TODO: 不重复抓取页面。
+        // 下面并没有实现上面两种情况：
+	if depth <= 0 {
+		return
+	}
+	body, urls, err := fetcher.Fetch(url)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("found: %s %q\n", url, body)
+	for _, u := range urls {
+		Crawl(u, depth-1, fetcher)
+	}
+	return
+}
+
+func main() {
+	Crawl("https://golang.org/", 4, fetcher)
+}
+
+// fakeFetcher 是返回若干结果的 Fetcher。
+type fakeFetcher map[string]*fakeResult
+
+type fakeResult struct {
+	body string
+	urls []string
+}
+
+func (f fakeFetcher) Fetch(url string) (string, []string, error) {
+	if res, ok := f[url]; ok {
+		return res.body, res.urls, nil
+	}
+	return "", nil, fmt.Errorf("not found: %s", url)
+}
+
+// fetcher 是填充后的 fakeFetcher。
+var fetcher = fakeFetcher{
+	"https://golang.org/": &fakeResult{
+		"The Go Programming Language",
+		[]string{
+			"https://golang.org/pkg/",
+			"https://golang.org/cmd/",
+		},
+	},
+	"https://golang.org/pkg/": &fakeResult{
+		"Packages",
+		[]string{
+			"https://golang.org/",
+			"https://golang.org/cmd/",
+			"https://golang.org/pkg/fmt/",
+			"https://golang.org/pkg/os/",
+		},
+	},
+	"https://golang.org/pkg/fmt/": &fakeResult{
+		"Package fmt",
+		[]string{
+			"https://golang.org/",
+			"https://golang.org/pkg/",
+		},
+	},
+	"https://golang.org/pkg/os/": &fakeResult{
+		"Package os",
+		[]string{
+			"https://golang.org/",
+			"https://golang.org/pkg/",
+		},
+	},
+}
+```
+
 
 ## 11.接下来去哪？
 

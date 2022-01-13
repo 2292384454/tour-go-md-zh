@@ -2,10 +2,17 @@ package main
 
 import (
 	"golang.org/x/tour/wc"
+	"strings"
 )
 
 func WordCount(s string) map[string]int {
-	return map[string]int{"x": 1}
+	ret := make(map[string]int)
+	// kevinhwang: strings.Fields(s) 相当于 java中的s.split("\\s+")
+	wordList := strings.Fields(s)
+	for _, v := range wordList {
+		ret[v] = ret[v] + 1
+	}
+	return ret
 }
 
 func main() {

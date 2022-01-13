@@ -31,6 +31,16 @@ https://go-zh.org
 如果你准备好了，请点击页面底部的`右箭头`或按 `PageDown` 键继续。
 
 [hello.go](ch0-welcome/hello/hello.go)
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello, 世界")
+}
+```
+
 
 ## 2.Go 本地化
 
@@ -79,6 +89,21 @@ go get -u github.com/Go-zh/tour tour
   了解更多信息。
 
 [sandbox.go](ch0-welcome/sandbox/sandbox.go)
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	fmt.Println("Welcome to the playground!")
+
+	fmt.Println("The time is", time.Now())
+}
+```
+
 
 ## 恭喜！
 

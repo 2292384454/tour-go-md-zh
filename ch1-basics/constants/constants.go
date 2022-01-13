@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// Pi kevinhwang: 常量不能用 := 语法声明。
 const Pi = 3.14
 
 func main() {
