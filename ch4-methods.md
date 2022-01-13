@@ -339,7 +339,7 @@ func main() {
 
 接口类型的变量可以保存任何实现了这些方法的值。
 
-**注意:** 示例代码的 22 行存在一个错误。由于 `Abs` 方法只为 `## Vertex` （指针类型）定义，因此 `Vertex`（值类型）并未实现 `Abser`。
+**注意:** 示例代码的 22 行存在一个错误。由于 `Abs` 方法只为 `*Vertex` （指针类型）定义，因此 `Vertex`（值类型）并未实现 `Abser`。
 
 [interfaces.go](ch4-methods/interfaces/interfaces.go)
 
@@ -534,7 +534,7 @@ func describe(i I) {
 
 nil 接口值既不保存值也不保存具体类型。
 
-为 nil 接口调用方法会产生运行时错误，因为接口的元组内并未包含能够指明该调用哪个 ## 具体## 方法的类型。
+为 nil 接口调用方法会产生运行时错误，因为接口的元组内并未包含能够指明该调用哪个 **具体** 方法的类型。
 
 [nil-interface-values.go](ch4-methods/nil-interface-values/nil-interface-values.go)
 
@@ -601,7 +601,7 @@ func describe(i interface{}) {
 
 若 `i` 并未保存 `T` 类型的值，该语句就会触发一个panic。
 
-为了 ## 判断## 一个接口值是否保存了一个特定的类型，类型断言可返回两个值：其底层值以及一个报告断言是否成功的布尔值。
+为了 **判断** 一个接口值是否保存了一个特定的类型，类型断言可返回两个值：其底层值以及一个报告断言是否成功的布尔值。
 
 	t, ok := i.(T)
 

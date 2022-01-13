@@ -21,7 +21,7 @@ func Pic(dx, dy int) [][]uint8 {
 func main() {
 	str := pic.Show(Pic)
 
-	// kevinhwang:原本的 pic.Show() 行数将打印出一个 base64 字符串，由于无法在控制台显示图片，所以对该函数做了修改，将 base64 字符串返回后转成图片再保存到本地
+	// kevinhwang原本的 pic.Show() 行数将打印出一个 base64 字符串，由于无法在控制台显示图片，所以对该函数做了修改，将 base64 字符串返回后转成图片再保存到本地
 
 	// base64 字符串解码成图片
 	dist, _ := base64.StdEncoding.DecodeString(str)
