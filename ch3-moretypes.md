@@ -1,0 +1,325 @@
+# 更多类型：struct、slice 和映射
+
+学习如何基于现有类型定义新的类型：本节课涵盖了结构体、数组、切片和映射。
+
+Go 作者组编写，Go-zh 小组翻译。
+https://go-zh.org
+
+## 1.指针
+
+Go 拥有指针。指针保存了值的内存地址。
+
+类型 `*T` 是指向 `T` 类型值的指针。其零值为 `nil`。
+
+	var p *int
+
+`&` 操作符会生成一个指向其操作数的指针。
+
+	i := 42
+	p = &i
+
+`*` 操作符表示指针指向的底层值。
+
+	fmt.Println(*p) // 通过指针 p 读取 i
+	*p = 21         // 通过指针 p 设置 i
+
+这也就是通常所说的“间接引用”或“重定向”。
+
+与 C 不同，Go 没有指针运算。
+
+[pointers.go](ch3-moretypes/pointers/pointers.go)
+
+## 2.结构体
+
+一个结构体（`struct`）就是一组字段（field）。
+
+[structs.go](ch3-moretypes/structs/structs.go)
+
+## 3.结构体字段
+
+结构体字段使用点号来访问。
+
+[struct-fields.go](ch3-moretypes/struct-fields/struct-fields.go)
+
+## 4.结构体指针
+
+结构体字段可以通过结构体指针来访问。
+
+如果我们有一个指向结构体的指针 `p`，那么可以通过 `(*p).X` 来访问其字段 `X`。不过这么写太啰嗦了，所以语言也允许我们使用隐式间接引用，直接写 `p.X` 就可以。
+
+[struct-pointers.go](ch3-moretypes/struct-pointers/struct-pointers.go)
+
+## 5.结构体文法
+
+结构体文法通过直接列出字段的值来新分配一个结构体。
+
+使用 `Name:` 语法可以仅列出部分字段。（字段名的顺序无关。）
+
+特殊的前缀 `&` 返回一个指向结构体的指针。
+
+[struct-literals.go](ch3-moretypes/struct-literals/struct-literals.go)
+
+## 6.数组
+
+类型 `[n]T` 表示拥有 `n` 个 `T` 类型的值的数组。
+
+表达式
+
+```
+var a [10]int
+```
+
+会将变量 `a` 声明为拥有 10 个整数的数组。
+
+数组的长度是其类型的一部分，因此数组不能改变大小。这看起来是个限制，不过没关系，Go 提供了更加便利的方式来使用数组。
+
+[array.go](ch3-moretypes/array/array.go)
+
+## 7.切片
+
+每个数组的大小都是固定的。而切片则为数组元素提供动态大小的、灵活的视角。在实践中，切片比数组更常用。
+
+类型 `[]T` 表示一个元素类型为 `T` 的切片。
+
+切片通过两个下标来界定，即一个上界和一个下界，二者以冒号分隔：
+
+```
+a[low : high]
+```
+
+它会选择一个半开区间，包括第一个元素，但排除最后一个元素。
+
+以下表达式创建了一个切片，它包含 `a` 中下标从 1 到 3 的元素：
+
+```
+a[1:4]
+```
+
+[slices.go](ch3-moretypes/slices/slices.go)
+
+## 8.切片就像数组的引用
+
+切片并不存储任何数据，它只是描述了底层数组中的一段。
+
+更改切片的元素会修改其底层数组中对应的元素。
+
+与它共享底层数组的切片都会观测到这些修改。
+
+[slices-pointers.go](ch3-moretypes/slices-pointers/slices-pointers.go)
+
+## 9.切片文法
+
+切片文法类似于没有长度的数组文法。
+
+这是一个数组文法：
+
+	[3]bool{true, true, false}
+
+下面这样则会创建一个和上面相同的数组，然后构建一个引用了它的切片：
+
+	[]bool{true, true, false}
+
+[slice-literals.go](ch3-moretypes/slice-literals/slice-literals.go)
+
+## 10.切片的默认行为
+
+在进行切片时，你可以利用它的默认行为来忽略上下界。
+
+切片下界的默认值为 `0`，上界则是该切片的长度。
+
+对于数组
+
+	var a [10]int
+
+来说，以下切片是等价的：
+
+	a[0:10]
+	a[:10]
+	a[0:]
+	a[:]
+
+[slice-bounds.go](ch3-moretypes/slice-bounds/slice-bounds.go)
+
+## 11.切片的长度与容量
+
+切片拥有 *长度## 和 *容量*。
+
+切片的长度就是它所包含的元素个数。
+
+切片的容量是从它的第一个元素开始数，到其底层数组元素末尾的个数。
+
+切片 `s` 的长度和容量可通过表达式 `len(s)` 和 `cap(s)` 来获取。
+
+只要具有足够的容量，你就可以通过重新切片来扩展一个切片。请试着修改示例程序中的某个切片操作，使其长度超过容量（即将它扩展到超出其容量范围），看看会发生什么。
+
+[slice-len-cap.go](ch3-moretypes/slice-len-cap/slice-len-cap.go)
+
+## 12.nil 切片
+
+切片的零值是 `nil`。
+
+nil 切片的长度和容量为 0 且没有底层数组。
+
+[nil-slices.go](ch3-moretypes/nil-slices/nil-slices.go)
+
+## 13.用 make 创建切片
+
+切片可以用内建函数 `make` 来创建，这也是你创建动态数组的方式。
+
+`make` 函数会分配一个元素为零值的数组并返回一个引用了它的切片：
+
+	a := make([]int, 5)  // len(a)=5
+
+要指定它的容量，需向 `make` 传入第三个参数：
+
+	b := make([]int, 0, 5) // len(b)=0, cap(b)=5
+
+	b = b[:cap(b] // len(b)=5, cap(b)=5
+	b = b[1:]      // len(b)=4, cap(b)=4
+
+[making-slices.go](ch3-moretypes/making-slices/making-slices.go)
+
+## 14.切片的切片
+
+切片可包含任何类型，甚至包括其它的切片。
+
+[ * ](ch3-moretypes/slices-of-slice/slices-of-slice.go)
+
+## 15.向切片追加元素
+
+为切片追加新的元素是种常用的操作，为此 Go 提供了内建的 `append` 函数。内建函数的[文档](https://go-zh.org/pkg/builtin/#append )对此函数有详细的介绍。
+
+	func append(s []T, vs ...T) []T
+
+`append` 的第一个参数 `s` 是一个元素类型为 `T` 的切片，其余类型为 `T` 的值将会追加到该切片的末尾。
+
+`append` 的结果是一个包含原切片所有元素加上新添加元素的切片。
+
+当 `s` 的底层数组太小，不足以容纳所有给定的值时，它就会分配一个更大的数组。返回的切片会指向这个新分配的数组。
+
+（要了解关于切片的更多内容，请阅读文章 [Go 切片：用法和本质](https://blog.go-zh.org/go-slices-usage-and-internals )。）
+
+[append.go](ch3-moretypes/append/append.go)
+
+## 16.Range
+
+`for` 循环的 `range` 形式可遍历切片或映射。
+
+当使用 `for` 循环遍历切片时，每次迭代都会返回两个值。第一个值为当前元素的下标，第二个值为该下标所对应元素的一份副本。
+
+[range.go](ch3-moretypes/range/range.go)
+
+## 17.range（续）
+
+可以将下标或值赋予 `_` 来忽略它。
+
+    for i, _ := range pow
+    for _, value := range pow
+
+若你只需要索引，忽略第二个变量即可。
+
+    for i := range pow
+
+[range-continued.go](ch3-moretypes/range-continued/range-continued.go)
+
+## 18.练习：切片
+
+实现 `Pic`。它应当返回一个长度为 `dy` 的切片，其中每个元素是一个长度为 `dx`，元素类型为 `uint8` 的切片。当你运行此程序时，它会将每个整数解释为灰度值（好吧，其实是蓝度值）并显示它所对应的图像。
+
+图像的选择由你来定。几个有趣的函数包括 `(x+y)/2`, `x*y`, `x^y`, `x*log(y)` 和 `x%(y+1)`。
+
+（提示：需要使用循环来分配 `[][]uint8` 中的每个 `[]uint8`；请使用 `uint8(intValue)` 在类型之间转换；你可能会用到 `math` 包中的函数。）
+
+[exercise-slices.go](ch3-moretypes/exercise-slices/exercise-slices.go)
+
+## 19.映射 (map)
+
+映射将键映射到值。
+
+映射的零值为 `nil` 。`nil` 映射既没有键，也不能添加键。
+
+`make` 函数会返回给定类型的映射，并将其初始化备用。
+
+[maps.go](ch3-moretypes/maps/maps.go)
+
+## 20.映射的文法
+
+映射的文法与结构体相似，不过必须有键名。
+
+[map-literals.go](ch3-moretypes/map-literals/map-literals.go)
+
+## 21.映射的文法（续）
+
+若顶级类型只是一个类型名，你可以在文法的元素中省略它。
+
+[map-literals-continued.go](ch3-moretypes/map-literals-continued/map-literals-continued.go)
+
+## 22.修改映射
+
+在映射 `m` 中插入或修改元素：
+
+	m[key] = elem
+
+获取元素：
+
+	elem = m[key]
+
+删除元素：
+
+	delete(m, key)
+
+通过双赋值检测某个键是否存在：
+
+	elem, ok = m[key]
+
+若 `key` 在 `m` 中，`ok` 为 `true` ；否则，`ok` 为 `false`。
+
+若 `key` 不在映射中，那么 `elem` 是该映射元素类型的零值。
+
+同样的，当从映射中读取某个不存在的键时，结果是映射的元素类型的零值。
+
+*注## ：若 `elem` 或 `ok` 还未声明，你可以使用短变量声明：
+
+	elem, ok := m[key]
+
+[mutating-maps.go](ch3-moretypes/mutating-maps/mutating-maps.go)
+
+## 23.练习：映射
+
+实现 `WordCount`。它应当返回一个映射，其中包含字符串 `s` 中每个“单词”的个数。函数 `wc.Test` 会对此函数执行一系列测试用例，并输出成功还是失败。
+
+你会发现 [strings.Fields](https://go-zh.org/pkg/strings/#Fields) 很有帮助。
+
+[exercise-maps.go](ch3-moretypes/exercise-maps/exercise-maps.go)
+
+## 24.函数值
+
+函数也是值。它们可以像其它值一样传递。
+
+函数值可以用作函数的参数或返回值。
+
+[function-values.go](ch3-moretypes/function-values/function-values.go)
+
+## 25.函数的闭包
+
+Go 函数可以是一个闭包。闭包是一个函数值，它引用了其函数体之外的变量。该函数可以访问并赋予其引用的变量的值，换句话说，该函数被这些变量“绑定”在一起。
+
+例如，函数 `adder` 返回一个闭包。每个闭包都被绑定在其各自的 `sum` 变量上。
+
+[function-closures.go](ch3-moretypes/function-closures/function-closures.go)
+
+## 26.练习：斐波纳契闭包
+
+让我们用函数做些好玩的事情。
+
+实现一个 `fibonacci`
+函数，它返回一个函数（闭包），该闭包返回一个[斐波纳契数列](https://zh.wikipedia.org/wiki/%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97) `(0, 1, 1, 2, 3, 5, ...)`
+。
+
+[exercise-fibonacci-closure.go](ch3-moretypes/exercise-fibonacci-closure/exercise-fibonacci-closure.go)
+
+## 27.恭喜！
+
+你已经完成了本课程！
+
+你可以返回[模块](list.md)列表看看接下来要学什么，或者继续[后面的课程](ch5-concurrency.md)。
