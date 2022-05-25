@@ -904,7 +904,7 @@ func main() {
 有种常见的模式是一个 [io.Reader](https://go-zh.org/pkg/io/#Reader) 包装另一个 `io.Reader`，然后通过某种方式修改其数据流。
 
 例如，[gzip.NewReader](https://go-zh.org/pkg/compress/gzip/#NewReader) 函数接受一个 `io.Reader`
-（已压缩的数据流）并返回一个同样实现了 `io.Reader` 的 `## gzip.Reader`（解压后的数据流）。
+（已压缩的数据流）并返回一个同样实现了 `io.Reader` 的 `*gzip.Reader`（解压后的数据流）。
 
 编写一个实现了 `io.Reader` 并从另一个 `io.Reader` 中读取数据的 `rot13Reader`，通过应用 [rot13](http://en.wikipedia.org/wiki/ROT13 )
 代换密码对数据流进行修改。
@@ -980,7 +980,7 @@ func main() {
 
 `ColorModel` 应当返回 `color.RGBAModel`。
 
-`At` 应当返回一个颜色。上一个图片生成器的值 `v` 对应于此次的 `color.RGBA{v,`v,`255,`255}`。
+`At` 应当返回一个颜色。上一个图片生成器的值 `v` 对应于此次的 `color.RGBA{v,v,255,255} `。
 
 [exercise-images.go](ch4-methods/exercise-images/exercise-images.go)
 

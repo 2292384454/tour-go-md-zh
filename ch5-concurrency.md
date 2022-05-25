@@ -20,6 +20,7 @@ Go 程（goroutine）是由 Go 运行时管理的轻量级线程。
 Go 程在相同的地址空间中运行，因此在访问共享的内存时必须进行同步。[sync](https://go-zh.org/pkg/sync/ ) 包提供了这种能力，不过在 Go 中并不经常用到，因为还有其它的办法（见下一页）。
 
 [goroutines.go](ch5-concurrency/goroutines/goroutines.go)
+
 ```go
 package main
 
@@ -60,6 +61,7 @@ func main() {
 以下示例对切片中的数进行求和，将任务分配给两个 Go 程。一旦两个 Go 程完成了它们的计算，它就能算出最终的结果。
 
 [channels.go](ch5-concurrency/channels/channels.go)
+
 ```go
 package main
 
@@ -88,7 +90,7 @@ func main() {
 
 ## 3.带缓冲的信道
 
-信道可以是 _带缓冲的_。将缓冲长度作为第二个参数提供给 `make` 来初始化一个带缓冲的信道：
+信道可以是 **带缓冲的**。将缓冲长度作为第二个参数提供给 `make` 来初始化一个带缓冲的信道：
 
 	ch := make(chan int, 100)
 
@@ -97,6 +99,7 @@ func main() {
 修改示例填满缓冲区，然后看看会发生什么。
 
 [buffered-channels.go](ch5-concurrency/buffered-channels/buffered-channels.go)
+
 ```go
 package main
 
@@ -127,6 +130,7 @@ func main() {
 **还要注意**： 信道与文件不同，通常情况下无需关闭它们。只有在必须告诉接收者不再有需要发送的值时才有必要关闭，例如终止一个 `range` 循环。
 
 [range-and-close.go](ch5-concurrency/range-and-close/range-and-close.go)
+
 ```go
 package main
 
@@ -160,6 +164,7 @@ func main() {
 `select` 会阻塞到某个分支可以继续执行为止，这时就会执行该分支。当多个分支都准备好时会随机选择一个执行。
 
 [select.go](ch5-concurrency/select/select.go)
+
 ```go
 package main
 
@@ -206,6 +211,7 @@ func main() {
 	}
 
 [default-selection.go](ch5-concurrency/default-selection/default-selection.go)
+
 ```go
 package main
 
@@ -272,6 +278,7 @@ func main() {
 `Tree` 的文档可在[这里](https://godoc.org/golang.org/x/tour/tree#Tree )找到。
 
 [exercise-equivalent-binary-trees.go](ch5-concurrency/exercise-equivalent-binary-trees/exercise-equivalent-binary-trees.go)
+
 ```go
 package main
 
@@ -306,6 +313,7 @@ Go 标准库中提供了 [sync.Mutex](https://go-zh.org/pkg/sync/#Mutex ) 互斥
 我们也可以用 `defer` 语句来保证互斥锁一定会被解锁。参见 `Value` 方法。
 
 [mutex-counter.go](ch5-concurrency/mutex-counter/mutex-counter.go)
+
 ```go
 package main
 
@@ -374,7 +382,7 @@ type Fetcher interface {
 func Crawl(url string, depth int, fetcher Fetcher) {
 	// TODO: 并行的抓取 URL。
 	// TODO: 不重复抓取页面。
-        // 下面并没有实现上面两种情况：
+    // 下面并没有实现上面两种情况：
 	if depth <= 0 {
 		return
 	}
@@ -454,8 +462,7 @@ var fetcher = fakeFetcher{
 ，或者阅读[如何编写 Go 代码](https://go-zh.org/doc/code.html )。 如果你需要标准库方面的帮助，请参考[包手册](https://go-zh.org/pkg/ )
 。如果是语言本身的帮助，阅读[语言规范](https://go-zh.org/ref/spec )是件令人愉快的事情。
 
-进一步探索 Go 的并发模型，参阅 [Go 并发模型](https://www.youtube.com/watch?v=f6kdp27TYZs )
-([幻灯片](https://talks.go-zh.org/2012/ch5-concurrency.slide ))
+进一步探索 Go 的并发模型，参阅 [Go 并发模型](https://www.youtube.com/watch?v=f6kdp27TYZs )([幻灯片](https://talks.go-zh.org/2012/ch5-concurrency.slide ))
 以及[深入 Go 并发模型](https://www.youtube.com/watch?v=QDDwwePbDtw )([幻灯片](https://talks.go-zh.org/2013/advconc.slide ))
 并阅读[通过通信共享内存](https://go-zh.org/doc/codewalk/sharemem/ )的代码之旅。
 
