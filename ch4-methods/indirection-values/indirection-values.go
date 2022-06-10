@@ -9,7 +9,7 @@ type Vertex struct {
 	X, Y float64
 }
 
-// Abs 接受者为 Vertex 类型的方法
+// Abs 接收者为 Vertex 类型的方法
 func (v Vertex) Abs() float64 {
 	return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }

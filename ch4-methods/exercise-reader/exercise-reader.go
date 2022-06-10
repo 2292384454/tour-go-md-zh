@@ -17,11 +17,11 @@ func (e MyReaderError) Error() string {
 
 // Read 给 MyReader 添加一个 Read([]byte) (int, error) 方法
 func (MyReader) Read(arr []byte) (int, error) {
-	l := cap(arr)
+	l := len(arr)
 	if l < 1 {
 		return l, MyReaderError(l)
 	}
-	for i, _ := range arr {
+	for i := range arr {
 		arr[i] = byte('A')
 	}
 	return l, nil
@@ -33,5 +33,6 @@ func main() {
 	// kevinhwang:test
 	myReader := MyReader{}
 	arr := make([]byte, 8)
-	fmt.Println(myReader.Read(arr))
+	n, err := myReader.Read(arr)
+	fmt.Println(n, err)
 }

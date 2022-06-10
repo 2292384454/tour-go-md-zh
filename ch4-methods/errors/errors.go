@@ -11,11 +11,15 @@ type MyError struct {
 }
 
 func (e *MyError) Error() string {
-	return fmt.Sprintf("at %v, %s", e.When, e.What)
+	return fmt.Sprintf("at %v, %s",
+		e.When.Format("2006-01-02 15:04:05"), e.What)
 }
 
 func run() error {
-	return &MyError{time.Now(), "it didn't work"}
+	return &MyError{
+		time.Now(),
+		"it didn't work",
+	}
 }
 
 func main() {

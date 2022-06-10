@@ -24,6 +24,10 @@ func main() {
 	// 可以一次性添加多个元素
 	s = append(s, 2, 3, 4)
 	printSlice(s)
+
+	//kevinhwang: 从切片里删除一个元素
+	s = append(s[:1], s[2:]...)
+	printSlice(s)
 }
 
 func printSlice(s []int) {

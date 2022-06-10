@@ -190,16 +190,20 @@ func main() {
 
 比较前两个程序，你大概会注意到带指针参数的函数必须接受一个指针：
 
-	var v Vertex
-	ScaleFunc(v, 5)  // 编译错误！
-	ScaleFunc(&v, 5) // OK
+```go
+var v Vertex
+ScaleFunc(v, 5)  // 编译错误！
+ScaleFunc(&v, 5) // OK
+```
 
 而以指针为接收者的方法被调用时，接收者既能为值又能为指针：
 
-	var v Vertex
-	v.Scale(5)  // OK
-	p := &v
-	p.Scale(10) // OK
+```go
+var v Vertex
+v.Scale(5)  // OK
+p := &v
+p.Scale(10) // OK
+```
 
 对于语句 `v.Scale(5)`，即便 `v` 是个值而非指针，带指针接收者的方法也能被直接调用。 也就是说，由于 `Scale` 方法有一个指针接收者，为方便起见，Go 会将语句 `v.Scale(5)`
 解释为 `(&v).Scale(5)`。
@@ -244,16 +248,20 @@ func main() {
 
 接受一个值作为参数的函数必须接受一个指定类型的值：
 
-	var v Vertex
-	fmt.Println(AbsFunc(v))  // OK
-	fmt.Println(AbsFunc(&v)) // 编译错误！
+```go
+var v Vertex
+fmt.Println(AbsFunc(v))  // OK
+fmt.Println(AbsFunc(&v)) // 编译错误！
+```
 
 而以值为接收者的方法被调用时，接收者既能为值又能为指针：
 
-	var v Vertex
-	fmt.Println(v.Abs()) // OK
-	p := &v
-	fmt.Println(p.Abs()) // OK
+```go
+var v Vertex
+fmt.Println(v.Abs()) // OK
+p := &v
+fmt.Println(p.Abs()) // OK
+```
 
 这种情况下，方法调用 `p.Abs()` 会被解释为 `(*p).Abs()`。
 
@@ -430,7 +438,9 @@ func main() {
 
 在内部，接口值可以看做包含值和具体类型的元组：
 
-	(value, type)
+```go
+(value, type)
+```
 
 接口值保存了一个具体底层类型的具体值。
 
@@ -562,7 +572,9 @@ func describe(i I) {
 
 指定了零个方法的接口值被称为 **空接口:**
 
-	interface{}
+```go
+interface{}
+```
 
 空接口可保存任何类型的值。（因为每个类型都至少实现了零个方法。）
 
@@ -595,7 +607,9 @@ func describe(i interface{}) {
 
 **类型断言**提供了访问接口值底层具体值的方式。
 
-	t := i.(T)
+```go
+t := i.(T)
+```
 
 该语句断言接口值 `i` 保存了具体类型 `T`，并将其底层类型为 `T` 的值赋予变量 `t`。
 
@@ -603,7 +617,9 @@ func describe(i interface{}) {
 
 为了 **判断** 一个接口值是否保存了一个特定的类型，类型断言可返回两个值：其底层值以及一个报告断言是否成功的布尔值。
 
-	t, ok := i.(T)
+```go
+t, ok := i.(T)
+```
 
 若 `i` 保存了一个 `T`，那么 `t` 将会是其底层值，而 `ok` 为 `true`。
 
@@ -641,14 +657,16 @@ func main() {
 
 类型选择与一般的 switch 语句相似，不过类型选择中的 case 为类型（而非值）， 它们针对给定接口值所存储的值的类型进行比较。
 
-	switch v := i.(type) {
-	case T:
-		// v 的类型为 T
-	case S:
-		// v 的类型为 S
-	default:
-		// 没有匹配，v 与 i 的类型相同
-	}
+```go
+switch v := i.(type) {
+case T:
+	// v 的类型为 T
+case S:
+	// v 的类型为 S
+default:
+	// 没有匹配，v 与 i 的类型相同
+}
+```
 
 类型选择中的声明与类型断言 `i.(T)` 的语法相同，只是具体类型 `T` 被替换成了关键字 `type`。
 
@@ -684,9 +702,11 @@ func main() {
 
 [fmt](https://go-zh.org/pkg/fmt/) 包中定义的 [Stringer](https://go-zh.org/pkg/fmt/#Stringer) 是最普遍的接口之一。
 
-	type Stringer interface {
-		String() string
-	}
+```go
+type Stringer interface {
+	String() string
+}
+```
 
 `Stringer` 是一个可以用字符串描述自己的类型。`fmt` 包（还有很多包）都通过此接口来打印值。
 
@@ -747,20 +767,24 @@ Go 程序使用 `error` 值来表示错误状态。
 
 与 `fmt.Stringer` 类似，`error` 类型是一个内建接口：
 
-	type error interface {
-		Error() string
-	}
+```go
+type error interface {
+	Error() string
+}
+```
 
 （与 `fmt.Stringer` 类似，`fmt` 包在打印值时也会满足 `error`。）
 
 通常函数会返回一个 `error` 值，调用它的代码应当判断这个错误是否等于 `nil` 来进行错误处理。
 
-	i, err := strconv.Atoi("42")
-	if err != nil {
-		fmt.Printf("couldn't convert number: %v\n", err)
-		return
-	}
-	fmt.Println("Converted integer:", i)
+```go
+i, err := strconv.Atoi("42")
+if err != nil {
+	fmt.Printf("couldn't convert number: %v\n", err)
+	return
+}
+fmt.Println("Converted integer:", i)
+```
 
 `error` 为 nil 时表示成功；非 nil 的 `error` 表示失败。
 
@@ -806,11 +830,15 @@ func main() {
 
 创建一个新的类型
 
-	type ErrNegativeSqrt float64
+```go
+type ErrNegativeSqrt float64
+```
 
 并为其实现
 
-	func (e ErrNegativeSqrt) Error() string
+```go
+func (e ErrNegativeSqrt) Error() string
+```
 
 方法使其拥有 `error` 值，通过 `ErrNegativeSqrt(-2).Error()` 调用该方法应返回 `"cannot`Sqrt`negative`number:`-2"`。
 
@@ -847,7 +875,9 @@ Go 标准库包含了该接口的[许多实现](https://go-zh.org/search?q=Read#
 
 `io.Reader` 接口有一个 `Read` 方法：
 
-	func (T) Read(b []byte) (n int, err error)
+```go
+func (T) Read(b []byte) (n int, err error)
+```
 
 `Read` 用数据填充给定的字节切片并返回填充的字节数和错误值。在遇到数据流的结尾时，它会返回一个 `io.EOF` 错误。
 
@@ -937,13 +967,15 @@ func main() {
 
 [`image`](https://go-zh.org/pkg/image/#Image) 包定义了 `Image` 接口：
 
-	package image
-	
-	type Image interface {
-		ColorModel() color.Model
-		Bounds() Rectangle
-		At(x, y int) color.Color
-	}
+```go
+package image
+
+type Image interface {
+	ColorModel() color.Model
+	Bounds() Rectangle
+	At(x, y int) color.Color
+}
+```
 
 **注意:**  `Bounds` 方法的返回值 `Rectangle` 实际上是一个 [image.Rectangle](https://go-zh.org/pkg/image/#Rectangle) ，它在 `image`
 包中声明。

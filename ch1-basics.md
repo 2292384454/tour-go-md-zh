@@ -263,19 +263,19 @@ func main() {
 Go 的基本类型有
 
 	bool
-
+	
 	string
-
+	
 	int  int8  int16  int32  int64
 	uint uint8 uint16 uint32 uint64 uintptr
-
+	
 	byte // uint8 的别名
-
+	
 	rune // int32 的别名
-         // 表示一个 Unicode 码点
-
+	     // 表示一个 Unicode 码点
+	
 	float32 float64
-
+	
 	complex64 complex128
 
 本例展示了几种类型的变量。 同导入语句一样，变量声明也可以“分组”成一个语法块。

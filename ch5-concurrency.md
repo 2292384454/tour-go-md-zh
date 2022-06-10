@@ -249,11 +249,13 @@ func main() {
 
 本例使用了 `tree` 包，它定义了类型：
 
-	type Tree struct {
-		Left  *Tree
-		Value int
-		Right *Tree
-	}
+```go
+type Tree struct {
+	Left  *Tree
+	Value int
+	Right *Tree
+}
+```
 
 点击`下一页`继续。
 

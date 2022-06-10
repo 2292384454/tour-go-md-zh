@@ -99,6 +99,7 @@ func main() {
 如果我们有一个指向结构体的指针 `p`，那么可以通过 `(*p).X` 来访问其字段 `X`。不过这么写太啰嗦了，所以语言也允许我们使用隐式间接引用，直接写 `p.X` 就可以。
 
 [struct-pointers.go](ch3-moretypes/struct-pointers/struct-pointers.go)
+
 ```go
 package main
 
@@ -127,6 +128,7 @@ func main() {
 特殊的前缀 `&` 返回一个指向结构体的指针。
 
 [struct-literals.go](ch3-moretypes/struct-literals/struct-literals.go)
+
 ```go
 package main
 
@@ -226,6 +228,7 @@ func main() {
 与它共享底层数组的切片都会观测到这些修改。
 
 [slices-pointers.go](ch3-moretypes/slices-pointers/slices-pointers.go)
+
 ```go
 package main
 
@@ -404,7 +407,7 @@ func main() {
 要指定它的容量，需向 `make` 传入第三个参数：
 
 	b := make([]int, 0, 5) // len(b)=0, cap(b)=5
-
+	
 	b = b[:cap(b] // len(b)=5, cap(b)=5
 	b = b[1:]      // len(b)=4, cap(b)=4
 
@@ -440,6 +443,7 @@ func printSlice(s string, x []int) {
 切片可包含任何类型，甚至包括其它的切片。
 
 [slices-of-slice.go](ch3-moretypes/slices-of-slice/slices-of-slice.go)
+
 ```go
 package main
 
@@ -485,6 +489,7 @@ func main() {
 （要了解关于切片的更多内容，请阅读文章 [Go 切片：用法和本质](https://blog.go-zh.org/go-slices-usage-and-internals )。）
 
 [append.go](ch3-moretypes/append/append.go)
+
 ```go
 package main
 
@@ -547,6 +552,7 @@ func main() {
     for i := range pow
 
 [range-continued.go](ch3-moretypes/range-continued/range-continued.go)
+
 ```go
 package main
 
@@ -573,6 +579,7 @@ func main() {
 （提示：需要使用循环来分配 `[][]uint8` 中的每个 `[]uint8`；请使用 `uint8(intValue)` 在类型之间转换；你可能会用到 `math` 包中的函数。）
 
 [exercise-slices.go](ch3-moretypes/exercise-slices/exercise-slices.go)
+
 ```go
 package main
 
@@ -596,6 +603,7 @@ func main() {
 `make` 函数会返回给定类型的映射，并将其初始化备用。
 
 [maps.go](ch3-moretypes/maps/maps.go)
+
 ```go
 package main
 
@@ -675,19 +683,27 @@ func main() {
 
 在映射 `m` 中插入或修改元素：
 
-	m[key] = elem
+```go
+m[key] = elem
+```
 
 获取元素：
 
-	elem = m[key]
+```go
+elem = m[key]
+```
 
 删除元素：
 
-	delete(m, key)
+```go
+delete(m, key)
+```
 
 通过双赋值检测某个键是否存在：
 
-	elem, ok = m[key]
+```go
+elem, ok = m[key]
+```
 
 若 `key` 在 `m` 中，`ok` 为 `true` ；否则，`ok` 为 `false`。
 
@@ -730,6 +746,7 @@ func main() {
 你会发现 [strings.Fields](https://go-zh.org/pkg/strings/#Fields) 很有帮助。
 
 [exercise-maps.go](ch3-moretypes/exercise-maps/exercise-maps.go)
+
 ```go
 package main
 
@@ -754,6 +771,7 @@ func main() {
 函数值可以用作函数的参数或返回值。
 
 [function-values.go](ch3-moretypes/function-values/function-values.go)
+
 ```go
 package main
 
